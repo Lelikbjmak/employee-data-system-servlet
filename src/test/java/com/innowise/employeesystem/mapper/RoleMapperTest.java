@@ -5,8 +5,6 @@ import com.innowise.employeesystem.entity.RoleEnum;
 import org.junit.jupiter.api.*;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Set;
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RoleMapperTest {
 
@@ -21,14 +19,14 @@ class RoleMapperTest {
 
     @Test
     @Order(2)
-    @DisplayName(value = "Map RoleEnum to Role entity")
+    @DisplayName(value = "Map String to Role entity")
     void mapToEntity() {
         Role expectedRole = Role.builder()
                 .id(1)
                 .name(RoleEnum.ROLE_ADMIN)
                 .build();
 
-        RoleEnum roleEnum = RoleEnum.ROLE_ADMIN;
+        String roleEnum = RoleEnum.ROLE_ADMIN.name();
         Role actualRole = roleMapper.mapToEntity(roleEnum);
 
         Assertions.assertEquals(expectedRole, actualRole);
@@ -36,30 +34,7 @@ class RoleMapperTest {
 
     @Test
     @Order(3)
-    @DisplayName(value = "Map Set<RoleEnum> to Set<Role>")
-    void mapToEntitySet() {
-
-        Set<Role> expectedRoleSet = Set.of(Role.builder()
-                        .id(1)
-                        .name(RoleEnum.ROLE_ADMIN)
-                        .build(),
-                Role.builder()
-                        .id(2)
-                        .name(RoleEnum.ROLE_USER)
-                        .build());
-
-        Set<RoleEnum> roleEnumSet = Set.of(
-                RoleEnum.ROLE_ADMIN,
-                RoleEnum.ROLE_USER
-        );
-
-        Set<Role> actualRoleSet = roleMapper.mapToEntitySet(roleEnumSet);
-        Assertions.assertEquals(expectedRoleSet, actualRoleSet);
-    }
-
-    @Test
-    @Order(4)
-    @DisplayName(value = "Map Role to RoleEnum dto")
+    @DisplayName(value = "Map Role to String dto")
     void mapToDto() {
 
         Role role = Role.builder()
@@ -67,35 +42,18 @@ class RoleMapperTest {
                 .name(RoleEnum.ROLE_ADMIN)
                 .build();
 
-        RoleEnum expectedRole = RoleEnum.ROLE_ADMIN;
+        String expectedRole = RoleEnum.ROLE_ADMIN.name();
 
-        RoleEnum actualRole = roleMapper.mapToDto(role);
+        String actualRole = roleMapper.mapToDto(role);
 
         Assertions.assertEquals(expectedRole, actualRole);
     }
 
     @Test
-    void mapToDtoSet() {
-
-        Set<Role> roleSet = Set.of(
-                Role.builder()
-                        .id(1)
-                        .name(RoleEnum.ROLE_ADMIN)
-                        .build(),
-                Role.builder()
-                        .id(2)
-                        .name(RoleEnum.ROLE_USER)
-                        .build()
-        );
-
-        Set<RoleEnum> expectedRoleSet = Set.of(
-                RoleEnum.ROLE_ADMIN,
-                RoleEnum.ROLE_USER
-        );
-
-        Set<RoleEnum> actualRoleSet = roleMapper.mapToDtoSet(roleSet);
-
-        Assertions.assertEquals(expectedRoleSet, actualRoleSet);
-
+    @Order(4)
+    @DisplayName(value = "Map null to null")
+    void mapToNull() {
+        Assertions.assertNull(roleMapper.mapToEntity(null));
+        Assertions.assertNull(roleMapper.mapToDto(null));
     }
 }

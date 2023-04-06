@@ -30,15 +30,15 @@ class UserMapperTest {
 
         UserDto userDto = UserDto.builder()
                 .id(1L)
-                .username(EntityConstant.User.USERNAME_FIELD)
-                .mail(EntityConstant.User.MAIL_FIELD)
+                .username(EntityConstant.User.USERNAME_FIELD_NAME)
+                .mail(EntityConstant.User.MAIL_FIELD_NAME)
                 .roles(Set.of(RoleEnum.ROLE_ADMIN))
                 .build();
 
         User expectedUser = User.builder()
                 .id(1L)
-                .username(EntityConstant.User.USERNAME_FIELD)
-                .mail(EntityConstant.User.MAIL_FIELD)
+                .username(EntityConstant.User.USERNAME_FIELD_NAME)
+                .mail(EntityConstant.User.MAIL_FIELD_NAME)
                 .roleSet(Set.of(Role.builder()
                         .id(1L)
                         .name(RoleEnum.ROLE_ADMIN)
@@ -57,15 +57,15 @@ class UserMapperTest {
 
         UserDto expectedUserDto = UserDto.builder()
                 .id(1L)
-                .username(EntityConstant.User.USERNAME_FIELD)
-                .mail(EntityConstant.User.MAIL_FIELD)
+                .username(EntityConstant.User.USERNAME_FIELD_NAME)
+                .mail(EntityConstant.User.MAIL_FIELD_NAME)
                 .roles(Set.of(RoleEnum.ROLE_ADMIN))
                 .build();
 
         User user = User.builder()
                 .id(1L)
-                .username(EntityConstant.User.USERNAME_FIELD)
-                .mail(EntityConstant.User.MAIL_FIELD)
+                .username(EntityConstant.User.USERNAME_FIELD_NAME)
+                .mail(EntityConstant.User.MAIL_FIELD_NAME)
                 .roleSet(Set.of(Role.builder()
                         .id(1L)
                         .name(RoleEnum.ROLE_ADMIN)
@@ -83,16 +83,16 @@ class UserMapperTest {
     void testMapToEntity() {
 
         RegistrationUserDto userDto = RegistrationUserDto.builder()
-                .username(EntityConstant.User.USERNAME_FIELD)
-                .password(EntityConstant.User.PASSWORD_FIELD)
-                .mail(EntityConstant.User.MAIL_FIELD)
-                .roles(Set.of(RoleEnum.ROLE_ADMIN))
+                .username(EntityConstant.User.USERNAME_FIELD_NAME)
+                .password(EntityConstant.User.PASSWORD_FIELD_NAME)
+                .mail(EntityConstant.User.MAIL_FIELD_NAME)
+                .roles(Set.of(RoleEnum.ROLE_ADMIN.name()))
                 .build();
 
         User expectedUser = User.builder()
-                .username(EntityConstant.User.USERNAME_FIELD)
-                .password(EntityConstant.User.PASSWORD_FIELD)
-                .mail(EntityConstant.User.MAIL_FIELD)
+                .username(EntityConstant.User.USERNAME_FIELD_NAME)
+                .password(EntityConstant.User.PASSWORD_FIELD_NAME)
+                .mail(EntityConstant.User.MAIL_FIELD_NAME)
                 .roleSet(Set.of(Role.builder()
                         .id(1L)
                         .name(RoleEnum.ROLE_ADMIN)
