@@ -36,7 +36,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement selectStatement = connection.prepareStatement(
-                     SqlConstant.EmployeeQuery.FIND_ALL_EMPLOYEE)) {
+                     SqlConstant.EmployeeQuery.FIND_ALL)) {
 
             ResultSet resultSet = selectStatement.executeQuery();
 
@@ -81,12 +81,13 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement insertStatement = connection.prepareStatement(
-                     SqlConstant.EmployeeQuery.INSERT, Statement.RETURN_GENERATED_KEYS)) {
+                     SqlConstant.EmployeeQuery.UPDATE, Statement.RETURN_GENERATED_KEYS)) {
 
             insertStatement.setString(1, employee.getFirstName());
             insertStatement.setString(2, employee.getLastName());
             insertStatement.setString(3, employee.getMiddleName());
             insertStatement.setObject(4, employee.getHireDate());
+            insertStatement.setLong(5, employee.getId());
 
             insertStatement.executeUpdate();
 
@@ -108,7 +109,6 @@ public class EmployeeDaoImpl implements EmployeeDao {
             insertStatement.setString(2, employee.getLastName());
             insertStatement.setString(3, employee.getMiddleName());
             insertStatement.setObject(4, employee.getHireDate());
-            insertStatement.setLong(5, employee.getUser().getId());
 
             insertStatement.executeUpdate();
             ResultSet generatedKeys = insertStatement.getGeneratedKeys();
@@ -126,7 +126,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement deleteStatement = connection.prepareStatement(
-                     SqlConstant.EmployeeQuery.DELETE_BY_ID)) {
+                     SqlConstant.EmployeeQuery.DELETE)) {
 
             deleteStatement.setLong(1, id);
             deleteStatement.executeUpdate();
