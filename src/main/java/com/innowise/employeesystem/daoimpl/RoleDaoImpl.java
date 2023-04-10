@@ -103,6 +103,29 @@ public class RoleDaoImpl implements RoleDao {
         return optionalRole;
     }
 
+    @Override
+    public Set<Role> getUserRoles(Long userId) {
+
+        Set<Role> foundRoleSet = new HashSet<>();
+
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SqlConstant.RoleQuery.FIND_ROLES_FOR_USER_BY_ID)) {
+
+            statement.setLong(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Role role = mapToEntity(resultSet);
+                foundRoleSet.add(role);
+            }
+
+        } catch (SQLException exception) {
+            log.error(exception.getSQLState() + exception.getMessage());
+        }
+
+        return foundRoleSet;
+    }
+
     private Role mapToEntity(ResultSet resultSet) throws SQLException {
         return Role.builder()
                 .id(resultSet.getLong(EntityConstant.CommonFields.ID_FIELD))

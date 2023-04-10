@@ -13,4 +13,6 @@ public interface RoleDao {
     Optional<Role> findByName(RoleEnum roleEnum);
 
     Optional<Role> findById(Long id);
+
+    Set<Role> getUserRoles(Long userId);
 }
