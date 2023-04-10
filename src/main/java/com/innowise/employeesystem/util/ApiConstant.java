@@ -8,6 +8,7 @@ public class ApiConstant {
     @UtilityClass
     public static class MediaType {
         public static final String APPLICATION_JSON_VALUE = "application/json";
+        public static final String CHARSET_ENCODING_VALUE = "UTF-8";
     }
 
     @UtilityClass
