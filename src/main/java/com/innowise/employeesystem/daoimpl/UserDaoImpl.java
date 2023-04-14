@@ -4,6 +4,7 @@ import com.innowise.employeesystem.config.HikariDatasource;
 import com.innowise.employeesystem.dao.UserDao;
 import com.innowise.employeesystem.entity.Role;
 import com.innowise.employeesystem.entity.User;
+import com.innowise.employeesystem.exception.DaoException;
 import com.innowise.employeesystem.util.EntityConstant;
 import com.innowise.employeesystem.util.SqlConstant;
 import com.zaxxer.hikari.HikariDataSource;
@@ -29,7 +30,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User add(User user, Connection connection) throws SQLException {
+    public User add(User user, Connection connection) throws DaoException {
 
         try (PreparedStatement userInsertStatement = connection.prepareStatement(SqlConstant.UserQuery.INSERT, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement userRolesInsertStatement = connection.prepareStatement(SqlConstant.UserQuery.INSERT_USER_ROLES, Statement.RETURN_GENERATED_KEYS)) {
@@ -54,11 +55,13 @@ public class UserDaoImpl implements UserDao {
             }
 
             return user;
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(Long id) throws DaoException {
 
         Optional<User> optionalUser = Optional.empty();
         User foundUser;
@@ -77,12 +80,12 @@ public class UserDaoImpl implements UserDao {
 
             return optionalUser;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<User> findByUsername(String username) throws DaoException {
 
         Optional<User> optionalUser = Optional.empty();
         User foundUser;
@@ -101,12 +104,12 @@ public class UserDaoImpl implements UserDao {
 
             return optionalUser;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public User save(User user) {
+    public User save(User user) throws DaoException {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement saveStatement = connection.prepareStatement(
@@ -121,12 +124,12 @@ public class UserDaoImpl implements UserDao {
 
             return user;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws DaoException {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement deleteStatement = connection.prepareStatement(
@@ -136,7 +139,7 @@ public class UserDaoImpl implements UserDao {
             deleteStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 

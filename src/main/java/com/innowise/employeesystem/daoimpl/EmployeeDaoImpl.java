@@ -3,6 +3,7 @@ package com.innowise.employeesystem.daoimpl;
 import com.innowise.employeesystem.config.HikariDatasource;
 import com.innowise.employeesystem.dao.EmployeeDao;
 import com.innowise.employeesystem.entity.Employee;
+import com.innowise.employeesystem.exception.DaoException;
 import com.innowise.employeesystem.util.EntityConstant;
 import com.innowise.employeesystem.util.SqlConstant;
 import com.zaxxer.hikari.HikariDataSource;
@@ -30,7 +31,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
     }
 
     @Override
-    public List<Employee> getAllEmployees() {
+    public List<Employee> getAllEmployees() throws DaoException {
 
         List<Employee> foundEmployeeList = new ArrayList<>();
 
@@ -46,14 +47,14 @@ public class EmployeeDaoImpl implements EmployeeDao {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
 
         return foundEmployeeList;
     }
 
     @Override
-    public Optional<Employee> findById(Long id) {
+    public Optional<Employee> findById(Long id) throws DaoException {
 
         Optional<Employee> optionalEmployee = Optional.empty();
 
@@ -70,14 +71,14 @@ public class EmployeeDaoImpl implements EmployeeDao {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
 
         return optionalEmployee;
     }
 
     @Override
-    public Employee save(Employee employee) {
+    public Employee save(Employee employee) throws DaoException {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement insertStatement = connection.prepareStatement(
@@ -92,15 +93,13 @@ public class EmployeeDaoImpl implements EmployeeDao {
             insertStatement.executeUpdate();
 
             return employee;
-        } catch (SQLException exception) {
-            System.err.println(exception);
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
-
-        return employee;
     }
 
     @Override
-    public Employee add(Employee employee, Connection connection) throws SQLException {
+    public Employee add(Employee employee, Connection connection) throws DaoException {
 
         try (PreparedStatement insertStatement = connection.prepareStatement(SqlConstant.EmployeeQuery.INSERT,
                 Statement.RETURN_GENERATED_KEYS)) {
@@ -117,12 +116,14 @@ public class EmployeeDaoImpl implements EmployeeDao {
                 employee.setId(generatedKeys.getLong(EntityConstant.CommonFields.ID_FIELD));
 
             return employee;
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
     }
 
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws DaoException {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement deleteStatement = connection.prepareStatement(
@@ -132,12 +133,12 @@ public class EmployeeDaoImpl implements EmployeeDao {
             deleteStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 
     @Override
-    public Optional<Employee> findByUsername(String username) {
+    public Optional<Employee> findByUsername(String username) throws DaoException {
 
         Optional<Employee> foundEmployee = Optional.empty();
 
@@ -156,7 +157,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
             return foundEmployee;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DaoException(e);
         }
     }
 

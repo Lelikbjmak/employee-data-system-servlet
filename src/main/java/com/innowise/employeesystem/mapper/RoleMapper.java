@@ -4,6 +4,7 @@ import com.innowise.employeesystem.dao.RoleDao;
 import com.innowise.employeesystem.daoimpl.RoleDaoImpl;
 import com.innowise.employeesystem.entity.Role;
 import com.innowise.employeesystem.entity.RoleEnum;
+import com.innowise.employeesystem.exception.DaoException;
 import com.innowise.employeesystem.exception.RoleNotFoundException;
 import com.innowise.employeesystem.util.EntityConstant;
 import com.innowise.employeesystem.util.MessageConstant;
@@ -24,11 +25,13 @@ public interface RoleMapper {
 
         try {
             RoleEnum roleEnum = RoleEnum.valueOf(roleString);
-            return roleDao.findByName(roleEnum).orElseThrow(() -> new RoleNotFoundException(MessageConstant.RoleMessage.ROLE_IS_NOT_FOUND_EXCEPTION_MESSAGE,
+            return roleDao.findByName(roleEnum).orElseThrow(() -> new RoleNotFoundException(MessageConstant.ROLE_IS_NOT_FOUND_EXCEPTION_MESSAGE,
                     Instant.now(), Map.of(EntityConstant.Role.NAME_FIELD, roleString)));
         } catch (IllegalArgumentException exception) {
-            throw new RoleNotFoundException(MessageConstant.RoleMessage.ROLE_IS_NOT_FOUND_EXCEPTION_MESSAGE,
+            throw new RoleNotFoundException(MessageConstant.ROLE_IS_NOT_FOUND_EXCEPTION_MESSAGE,
                     Instant.now(), Map.of(EntityConstant.Role.NAME_FIELD, roleString));
+        } catch (DaoException e) {
+            throw new RuntimeException(e);
         }
     }
 
