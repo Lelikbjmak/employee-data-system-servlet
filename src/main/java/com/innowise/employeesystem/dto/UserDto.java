@@ -1,8 +1,10 @@
 package com.innowise.employeesystem.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.innowise.employeesystem.entity.RoleEnum;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
@@ -11,7 +13,8 @@ import java.util.Set;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class UserDto implements Serializable {
 
     private Long id;
 
