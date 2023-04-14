@@ -1,6 +1,5 @@
 package com.innowise.employeesystem.dto;
 
-import com.innowise.employeesystem.entity.RoleEnum;
 import lombok.*;
 
 import java.util.Set;
@@ -18,5 +17,5 @@ public class RegistrationUserDto {
 
     private String mail;
 
-    private Set<RoleEnum> roles;
+    private Set<String> roles;
 }
