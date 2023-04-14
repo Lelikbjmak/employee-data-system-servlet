@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.employeesystem.command.EmployeeCommand;
 import com.innowise.employeesystem.dto.EmployeeDto;
 import com.innowise.employeesystem.entity.RoleEnum;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.provider.ObjectMapperProvider;
 import com.innowise.employeesystem.service.EmployeeEditService;
 import com.innowise.employeesystem.serviceimpl.EmployeeEditServiceImpl;
@@ -43,8 +44,8 @@ public class EditEmployeeCommand extends EmployeeCommand {
         try {
             EmployeeDto employeeDto = objectMapper.readValue(request.getInputStream(), EmployeeDto.class);
             EmployeeDto registeredEmployee = employeeEditService.edit(employeeDto);
-            responseService.processResponse(response, registeredEmployee, 200);
-        } catch (IOException e) {
+            responseService.processResponse(response, registeredEmployee, HttpServletResponse.SC_OK);
+        } catch (IOException | ServiceException e) {
             throw new RuntimeException(e);
         }
     }
