@@ -5,6 +5,7 @@ import com.innowise.employeesystem.command.EmployeeCommand;
 import com.innowise.employeesystem.dto.EmployeeDto;
 import com.innowise.employeesystem.dto.RegistrationDto;
 import com.innowise.employeesystem.entity.RoleEnum;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.provider.ObjectMapperProvider;
 import com.innowise.employeesystem.service.EmployeeRegistrationService;
 import com.innowise.employeesystem.serviceimpl.EmployeeRegistrationServiceImpl;
@@ -44,8 +45,8 @@ public class RegisterNewEmployeeCommand extends EmployeeCommand {
         try {
             RegistrationDto registrationDto = objectMapper.readValue(request.getInputStream(), RegistrationDto.class);
             EmployeeDto registeredEmployee = employeeRegistrationService.registerNewEmployee(registrationDto);
-            responseService.processResponse(response, registeredEmployee, 200);
-        } catch (IOException e) {
+            responseService.processResponse(response, registeredEmployee, HttpServletResponse.SC_OK);
+        } catch (IOException | ServiceException e) {
             throw new RuntimeException(e);
         }
     }
