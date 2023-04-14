@@ -4,6 +4,7 @@ import com.innowise.employeesystem.config.HikariDatasource;
 import com.innowise.employeesystem.dao.RoleDao;
 import com.innowise.employeesystem.entity.Role;
 import com.innowise.employeesystem.entity.RoleEnum;
+import com.innowise.employeesystem.exception.DaoException;
 import com.innowise.employeesystem.util.EntityConstant;
 import com.innowise.employeesystem.util.SqlConstant;
 import com.zaxxer.hikari.HikariDataSource;
@@ -36,7 +37,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public Set<Role> getAllRoles() {
+    public Set<Role> getAllRoles() throws DaoException {
 
         Set<Role> foundRoleSet = new HashSet<>();
 
@@ -51,14 +52,14 @@ public class RoleDaoImpl implements RoleDao {
             }
 
         } catch (SQLException e) {
-            log.error(e.getSQLState() + e.getMessage());
+            throw new DaoException(e);
         }
 
         return foundRoleSet;
     }
 
     @Override
-    public Optional<Role> findByName(RoleEnum roleEnum) {
+    public Optional<Role> findByName(RoleEnum roleEnum) throws DaoException {
 
         Optional<Role> optionalRole = Optional.empty();
 
@@ -73,15 +74,15 @@ public class RoleDaoImpl implements RoleDao {
                 optionalRole = Optional.of(foundRole);
             }
 
-        } catch (SQLException exception) {
-            log.error(exception.getSQLState() + exception.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
 
         return optionalRole;
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
+    public Optional<Role> findById(Long id) throws DaoException {
 
         Optional<Role> optionalRole = Optional.empty();
 
@@ -96,15 +97,15 @@ public class RoleDaoImpl implements RoleDao {
                 optionalRole = Optional.of(foundRole);
             }
 
-        } catch (SQLException exception) {
-            log.error(exception.getSQLState() + exception.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
 
         return optionalRole;
     }
 
     @Override
-    public Set<Role> getUserRoles(Long userId) {
+    public Set<Role> getUserRoles(Long userId) throws DaoException {
 
         Set<Role> foundRoleSet = new HashSet<>();
 
@@ -119,8 +120,8 @@ public class RoleDaoImpl implements RoleDao {
                 foundRoleSet.add(role);
             }
 
-        } catch (SQLException exception) {
-            log.error(exception.getSQLState() + exception.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e);
         }
 
         return foundRoleSet;
