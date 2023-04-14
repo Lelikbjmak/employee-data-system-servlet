@@ -4,6 +4,7 @@ import com.innowise.employeesystem.dao.EmployeeDao;
 import com.innowise.employeesystem.dao.RoleDao;
 import com.innowise.employeesystem.daoimpl.EmployeeDaoImpl;
 import com.innowise.employeesystem.daoimpl.RoleDaoImpl;
+import com.innowise.employeesystem.exception.DaoException;
 import lombok.*;
 
 import java.util.Set;
@@ -38,19 +39,25 @@ public class User {
 
     public Set<Role> getRoleSet() {
 
-        if (roleSet == null)
-            this.roleSet = roleDao.getUserRoles(id);
-
-
+        if (roleSet == null) {
+            try {
+                this.roleSet = roleDao.getUserRoles(id);
+            } catch (DaoException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return roleSet;
     }
 
-    public Employee getEmployee() {
+    public Employee getEmployee()  {
 
         if (employee == null) {
-            this.employee = employeeDao.findById(id).orElse(null);
+            try {
+                this.employee = employeeDao.findById(id).orElse(null);
+            } catch (DaoException e) {
+                throw new RuntimeException(e);
+            }
         }
-
         return employee;
     }
 }
