@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.innowise.employeesystem.dao.UserDao;
 import com.innowise.employeesystem.daoimpl.UserDaoImpl;
+import com.innowise.employeesystem.exception.DaoException;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -41,8 +42,13 @@ public class Employee {
 
     public User getUser() {
 
-        if (user == null)
-            user = USER_DAO.findById(id).orElse(null);
+        if (user == null) {
+            try {
+                user = USER_DAO.findById(id).orElse(null);
+            } catch (DaoException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         return user;
     }
