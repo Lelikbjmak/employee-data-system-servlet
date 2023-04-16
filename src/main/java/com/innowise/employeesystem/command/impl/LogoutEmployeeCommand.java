@@ -46,7 +46,7 @@ public class LogoutEmployeeCommand extends EmployeeCommand {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) {
 
-        String sessionId;
+        String sessionId = null;
 
         HttpSession session = request.getSession(false);
         Cookie sessionCookie = CookieUtil.retrieveCookie(request, ApiConstant.Session.SESSION_ID_COOKIE_NAME);
@@ -54,19 +54,21 @@ public class LogoutEmployeeCommand extends EmployeeCommand {
         if (session != null) {
             sessionId = session.getId();
             session.invalidate();
-        } else {
-            sessionId = sessionCookie.getValue();
         }
 
-        sessionCookie.setMaxAge(0);
-        response.addCookie(sessionCookie);
+        if (sessionCookie != null) {
+            sessionCookie.setMaxAge(0);
+            response.addCookie(sessionCookie);
+            sessionId = sessionCookie.getValue();
+        }
 
         redisSessionStoreService.deleteSession(sessionId);
 
         try {
             Response logoutResponse = responseProvider.generateResponse(ApiConstant.ResponseStatus.OK, HttpServletResponse.SC_OK, MessageConstant.LOGOUT_MESSAGE, null);
             responseService.processResponse(response, logoutResponse, HttpServletResponse.SC_OK);
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             throw new RuntimeException(e);
         }
     }
