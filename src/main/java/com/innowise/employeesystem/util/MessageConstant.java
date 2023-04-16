@@ -11,4 +11,5 @@ public class MessageConstant {
     public static final String USER_NOT_FOUND = "User not found.";
     public static final String INCORRECT_PASSWORD = "Incorrect password.";
     public static final String DELETE_EMPLOYEE_MESSAGE = "Successfully deleted employee.";
+    public static final String FAILED_AUTHENTICATION_MESSAGE = "Full authentication is required to access this endpoint.";
 }
