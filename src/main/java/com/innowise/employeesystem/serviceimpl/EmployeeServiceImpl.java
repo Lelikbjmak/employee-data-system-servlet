@@ -3,13 +3,14 @@ package com.innowise.employeesystem.serviceimpl;
 import com.innowise.employeesystem.daoimpl.EmployeeDaoImpl;
 import com.innowise.employeesystem.dto.EmployeeDto;
 import com.innowise.employeesystem.entity.Employee;
+import com.innowise.employeesystem.exception.DaoException;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.mapper.EmployeeListMapper;
 import com.innowise.employeesystem.mapper.EmployeeMapper;
 import com.innowise.employeesystem.service.EmployeeService;
 import org.mapstruct.factory.Mappers;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,54 +36,85 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto save(Employee employee) {
+    public EmployeeDto save(Employee employee) throws ServiceException {
+
         if (employee == null)
             return null;
-        Employee foundEmployee = employeeDao.findById(employee.getId()).orElseThrow(RuntimeException::new);
-        updateEmployeeFields(employee, foundEmployee);
-        Employee savedEmployee = employeeDao.save(foundEmployee);
-        return employeeMapper.mapToDto(savedEmployee);
+
+        try {
+            Employee foundEmployee = employeeDao.findById(employee.getId()).orElseThrow(RuntimeException::new);
+            updateEmployeeFields(employee, foundEmployee);
+            Employee savedEmployee = employeeDao.save(foundEmployee);
+            return employeeMapper.mapToDto(savedEmployee);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
+
     }
 
-    protected Employee register(Employee employee, Connection connection) throws SQLException {
+    protected Employee register(Employee employee, Connection connection) throws ServiceException {
+
         if (employee == null)
             return null;
 
-        return employeeDao.add(employee, connection);
+        try {
+            return employeeDao.add(employee, connection);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Long id) {
+    public EmployeeDto getEmployeeById(Long id) throws ServiceException {
+
         if (id == null)
             return null;
 
-        Optional<Employee> possibleFoundEmployee = employeeDao.findById(id);
-        Employee foundEmployee = possibleFoundEmployee.orElse(null);
-        return employeeMapper.mapToDto(foundEmployee);
+        try {
+
+            Optional<Employee> possibleFoundEmployee = employeeDao.findById(id);
+            Employee foundEmployee = possibleFoundEmployee.orElse(null);
+            return employeeMapper.mapToDto(foundEmployee);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public void deleteEmployeeById(Long id) {
+    public void deleteEmployeeById(Long id) throws ServiceException {
+
         if (id == null)
             return;
 
-        employeeDao.delete(id);
+        try {
+            employeeDao.delete(id);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public List<EmployeeDto> getAll() {
-        List<Employee> foundEmployeeList = employeeDao.getAllEmployees();
-        return employeeListMapper.mapToDto(foundEmployeeList);
+    public List<EmployeeDto> getAll() throws ServiceException {
+        try {
+            List<Employee> foundEmployeeList = employeeDao.getAllEmployees();
+            return employeeListMapper.mapToDto(foundEmployeeList);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public EmployeeDto getEmployeeByUserUsername(String username) {
+    public EmployeeDto getEmployeeByUserUsername(String username) throws ServiceException {
+
         if (username == null)
             return null;
-
-        Optional<Employee> possibleFoundEmployee = employeeDao.findByUsername(username);
-        Employee foundEmployee = possibleFoundEmployee.orElse(null);
-        return employeeMapper.mapToDto(foundEmployee);
+        try {
+            Optional<Employee> possibleFoundEmployee = employeeDao.findByUsername(username);
+            Employee foundEmployee = possibleFoundEmployee.orElse(null);
+            return employeeMapper.mapToDto(foundEmployee);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     private void updateEmployeeFields(Employee editedEmployee, Employee foundEmployee) {

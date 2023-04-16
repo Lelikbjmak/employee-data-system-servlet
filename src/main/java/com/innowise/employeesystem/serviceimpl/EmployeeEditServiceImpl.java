@@ -3,6 +3,7 @@ package com.innowise.employeesystem.serviceimpl;
 import com.innowise.employeesystem.dto.EmployeeDto;
 import com.innowise.employeesystem.dto.UserDto;
 import com.innowise.employeesystem.entity.Employee;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.mapper.EmployeeMapper;
 import com.innowise.employeesystem.service.EmployeeEditService;
 import com.innowise.employeesystem.service.EmployeeService;
@@ -33,18 +34,26 @@ public class EmployeeEditServiceImpl implements EmployeeEditService {
     }
 
     @Override
-    public EmployeeDto edit(EmployeeDto employeeDto) {
+    public EmployeeDto edit(EmployeeDto employeeDto) throws ServiceException {
+
         if (employeeDto == null)
             return null;
 
         Employee employee = employeeMapper.mapToEntity(employeeDto);
 
-        EmployeeDto editedEmployee = employeeService.save(employee);
-        if (employee.getUser() != null) {
-            UserDto editedUser = userService.save(employee.getUser());
-            editedEmployee.setUserDto(editedUser);
-        }
+        EmployeeDto editedEmployee;
 
-        return editedEmployee;
+        try {
+            editedEmployee = employeeService.save(employee);
+
+            if (employee.getUser() != null) {
+                UserDto editedUser = userService.save(employee.getUser());
+                editedEmployee.setUserDto(editedUser);
+            }
+
+            return editedEmployee;
+        } catch (ServiceException e) {
+            throw new ServiceException(e);
+        }
     }
 }

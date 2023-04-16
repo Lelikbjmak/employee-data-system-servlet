@@ -5,6 +5,7 @@ import com.innowise.employeesystem.dto.EmployeeDto;
 import com.innowise.employeesystem.dto.RegistrationDto;
 import com.innowise.employeesystem.entity.Employee;
 import com.innowise.employeesystem.entity.User;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.mapper.EmployeeMapper;
 import com.innowise.employeesystem.mapper.UserMapper;
 import com.innowise.employeesystem.service.EmployeeRegistrationService;
@@ -44,7 +45,7 @@ public class EmployeeRegistrationServiceImpl implements EmployeeRegistrationServ
     }
 
     @Override
-    public EmployeeDto registerNewEmployee(RegistrationDto registrationDto) {
+    public EmployeeDto registerNewEmployee(RegistrationDto registrationDto) throws ServiceException {
 
         User newUser = userMapper.mapToEntity(
                 registrationDto.getRegistrationUserDto());
@@ -65,8 +66,8 @@ public class EmployeeRegistrationServiceImpl implements EmployeeRegistrationServ
             connection.commit();
 
             return employeeMapper.mapToDto(employee);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException | ServiceException e) {
+            throw new ServiceException(e);
         }
     }
 }
