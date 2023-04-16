@@ -1,0 +1,15 @@
+# ----- Properties -----
+
+redis:
+  host: localhost
+  port: 6379
+password-encoder:
+  salt-length: 16
+  hash_length: 32
+  iterations: 2
+  memory: 65536
+  parallelism: 1
+session:
+  inactive-interval: 3600000
+
+
