@@ -1,14 +1,17 @@
 package com.innowise.employeesystem.serviceimpl;
 
 import com.innowise.employeesystem.dto.AuthenticationRequest;
-import com.innowise.employeesystem.dto.AuthenticationStatus;
 import com.innowise.employeesystem.dto.Response;
 import com.innowise.employeesystem.dto.UserDto;
 import com.innowise.employeesystem.entity.User;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.mapper.UserMapper;
 import com.innowise.employeesystem.provider.ResponseProvider;
 import com.innowise.employeesystem.security.Argon2PasswordEncoder;
+import com.innowise.employeesystem.security.AuthenticationStatus;
+import com.innowise.employeesystem.security.RedisSession;
 import com.innowise.employeesystem.service.AuthenticationService;
+import com.innowise.employeesystem.service.RedisSessionStoreService;
 import com.innowise.employeesystem.service.UserService;
 import com.innowise.employeesystem.util.ApiConstant;
 import com.innowise.employeesystem.util.EntityConstant;
@@ -31,6 +34,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
+    private final RedisSessionStoreService redisSessionStoreService;
+
     public static AuthenticationServiceImpl getInstance() {
         if (instance == null)
             instance = new AuthenticationServiceImpl();
@@ -42,6 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.userService = UserServiceImpl.getInstance();
         this.argon2PasswordEncoder = Argon2PasswordEncoder.getInstance();
         this.authenticationResponseProvider = ResponseProvider.getInstance();
+        this.redisSessionStoreService = RedisSessionStoreServiceImpl.getInstance();
     }
 
     @Override
@@ -50,7 +56,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String username = authenticationRequest.username();
         String password = authenticationRequest.password();
 
-        User foundUser = userService.getByUsername(username);
+        User foundUser;
+
+        try {
+            foundUser = userService.getByUsername(username);
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
 
         if (foundUser == null) {
             return authenticationResponseProvider.generateResponse(ApiConstant.ResponseStatus.NOT_FOUND, HttpServletResponse.SC_NOT_FOUND,
@@ -59,15 +71,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (!argon2PasswordEncoder.verify(foundUser.getPassword(), password)) {
             return authenticationResponseProvider.generateResponse(ApiConstant.ResponseStatus.UNAUTHORIZED, HttpServletResponse.SC_UNAUTHORIZED,
-                    AuthenticationStatus.USER_NOT_FOUND.getMessage(), Map.of(EntityConstant.User.PASSWORD_FIELD_NAME, password));
+                    AuthenticationStatus.INCORRECT_PASSWORD.getMessage(), Map.of(EntityConstant.User.PASSWORD_FIELD_NAME, password));
         }
 
         UserDto authenticatedUser = userMapper.mapToDto(foundUser);
 
         HttpSession session = request.getSession(true);
-        session.setAttribute(ApiConstant.Session.LOGGED_IN_USER_ATTRIBUTE, authenticatedUser);
 
-        return authenticationResponseProvider.generateResponse(ApiConstant.ResponseStatus.OK, 200,
+        RedisSession redisSession = new RedisSession();
+        redisSession.setSessionId(session.getId());
+        redisSession.setSessionCredentials(authenticatedUser);
+        redisSession.setLastAccessedTime(System.currentTimeMillis());
+
+        redisSessionStoreService.saveSession(redisSession);
+
+        return authenticationResponseProvider.generateResponse(ApiConstant.ResponseStatus.OK, HttpServletResponse.SC_OK,
                 AuthenticationStatus.OK.getMessage(), null);
     }
 }

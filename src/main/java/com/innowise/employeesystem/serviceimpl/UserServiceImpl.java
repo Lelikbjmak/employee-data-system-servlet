@@ -3,13 +3,14 @@ package com.innowise.employeesystem.serviceimpl;
 import com.innowise.employeesystem.daoimpl.UserDaoImpl;
 import com.innowise.employeesystem.dto.UserDto;
 import com.innowise.employeesystem.entity.User;
+import com.innowise.employeesystem.exception.DaoException;
+import com.innowise.employeesystem.exception.ServiceException;
 import com.innowise.employeesystem.mapper.UserMapper;
 import com.innowise.employeesystem.security.Argon2PasswordEncoder;
 import com.innowise.employeesystem.service.UserService;
 import org.mapstruct.factory.Mappers;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
@@ -35,34 +36,59 @@ public class UserServiceImpl implements UserService {
         return instance;
     }
 
-    protected User register(User user, Connection connection) throws SQLException {
+    protected User register(User user, Connection connection) throws ServiceException {
+
         hashPassword(user);
-        return userDao.add(user, connection);
+
+        try {
+            return userDao.add(user, connection);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public UserDto save(User user) {
-        User foundUser = userDao.findById(user.getId()).orElseThrow(RuntimeException::new);
-        updateUserFields(user, foundUser);
-        User savedUser = userDao.save(user);
-        return userMapper.mapToDto(savedUser);
+    public UserDto save(User user) throws ServiceException {
+
+        User foundUser;
+
+        try {
+            foundUser = userDao.findById(user.getId()).orElseThrow(RuntimeException::new);
+            updateUserFields(user, foundUser);
+            User savedUser = userDao.save(user);
+            return userMapper.mapToDto(savedUser);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public User getUserById(Long id) {
-        Optional<User> userOptional = userDao.findById(id);
-        return userOptional.orElse(null);
+    public User getUserById(Long id) throws ServiceException {
+        try {
+            Optional<User> userOptional = userDao.findById(id);
+            return userOptional.orElse(null);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public void deleteUserById(Long id) {
-        userDao.delete(id);
+    public void deleteUserById(Long id) throws ServiceException {
+        try {
+            userDao.delete(id);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
-    public User getByUsername(String username) {
-        Optional<User> optionalUser = userDao.findByUsername(username);
-        return optionalUser.orElse(null);
+    public User getByUsername(String username) throws ServiceException {
+        try {
+            Optional<User> optionalUser = userDao.findByUsername(username);
+            return optionalUser.orElse(null);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     private void hashPassword(User user) {
