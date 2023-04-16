@@ -50,7 +50,7 @@ public class AuthorizationFilter implements Filter {
         HttpSession session = request.getSession(false);
 
         if (session == null)
-            sessionId = CookieUtil.retrieveCookie(request, ApiConstant.Session.SESSION_ID_COOKIE_NAME).getValue();
+            sessionId = CookieUtil.retrieveCookie(request, ApiConstant.Session.SESSION_ID_COOKIE_NAME).getValue(); // not check cause after AuthenticationSession user already has session retrieved from Redis
         else
             sessionId = session.getId();
 
@@ -65,9 +65,7 @@ public class AuthorizationFilter implements Filter {
             Response authorizationResponse = responseProvider.generateResponse(ApiConstant.ResponseStatus.UNAUTHORIZED, HttpServletResponse.SC_UNAUTHORIZED,
                     "Access denied. Non compliant authorities.", null);
             responseService.processResponse(response, authorizationResponse, HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        filterChain.doFilter(request, response);
+        } else
+            filterChain.doFilter(request, response);
     }
 }
