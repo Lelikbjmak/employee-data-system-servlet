@@ -42,7 +42,7 @@ public class AuthenticationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        SessionStatus sessionStatus = SessionStatus.OK;
+        SessionStatus sessionStatus;
         HttpSession session = request.getSession(false);
 
         if (session != null) {
@@ -66,9 +66,8 @@ public class AuthenticationFilter implements Filter {
             Response failedAuthenticationResponse = responseProvider.generateResponse(ApiConstant.ResponseStatus.UNAUTHORIZED, 401,
                     MessageConstant.FAILED_AUTHENTICATION_MESSAGE, Map.of("session status", sessionStatus.getMessage()));
             responseService.processResponse(response, failedAuthenticationResponse, failedAuthenticationResponse.code());
-        }
-
-        filterChain.doFilter(request, response);
+        } else
+            filterChain.doFilter(request, response);
     }
 
     private SessionStatus validateSession(RedisSession redisSession) {
